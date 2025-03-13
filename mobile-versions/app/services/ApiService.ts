@@ -1,4 +1,5 @@
 import { API_BASE_URL } from "../config";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 class APIService {
   private baseURL: string;
@@ -12,14 +13,20 @@ class APIService {
       method: string = "GET",
       //@typescript-eslint/no-explicit-any
       body?: any,
-      headers: HeadersInit = this.getDefaultHeaders()
+      headers?: HeadersInit
   ): Promise<T> {
+    if(!headers) {
+      headers = await this.getDefaultHeaders()
+    }
     console.log(`${this.baseURL}/${url}`);
+    console.log(headers);
     const response = await fetch(`${this.baseURL}/${url}`, {
-      method,
-      headers,
+      method:method,
+      headers:headers,
       body: body ? JSON.stringify(body) : undefined,
     });
+    console.log('Status:', response.status);
+    console.log('Headers:', response.headers);
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -37,15 +44,13 @@ class APIService {
     return response.json();
   }
 
-  private getDefaultHeaders(): HeadersInit {
+  private async getDefaultHeaders(): Promise<HeadersInit> {
     const headers: HeadersInit = {
       "Content-Type": "application/json",
     };
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("token");
-      if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-      }
+    const token = await AsyncStorage.getItem("token");
+    if (token) {
+      headers["Authorization"] = 'Bearer '+token;
     }
 
     return headers;
@@ -59,7 +64,15 @@ class APIService {
   }
 
   getById<T>(resource: string, id: number | string): Promise<T> {
-    return this.request<T>(`${resource}/${id}`);
+    let localResource;
+    if(resource.split('')[resource.length-1] === '/')
+    {
+      localResource = resource.slice(0, -1);
+    }
+    else{
+      localResource = resource;
+    }
+    return this.request<T>(`${localResource}/${id}`);
   }
   //@typescript-eslint/no-explicit-any
   create<T>(resource: string, data: any): Promise<T> {
@@ -68,7 +81,15 @@ class APIService {
 
   //@typescript-eslint/no-explicit-any
   update<T>(resource: string, id: number | string, data: any): Promise<T> {
-    return this.request<T>(`${resource}/${id}`, "PUT", data);
+    let localResource;
+    if(resource.split('')[resource.length-1] === '/')
+    {
+      localResource = resource.slice(0, -1);
+    }
+    else{
+      localResource = resource;
+    }
+    return this.request<T>(`${localResource}/${id}`, "PUT", data);
   }
 
   //@typescript-eslint/no-explicit-any
@@ -77,7 +98,15 @@ class APIService {
   }
 
   delete<T>(resource: string, id: number | string): Promise<T> {
-    return this.request<T>(`${resource}/${id}`, "DELETE");
+    let localResource;
+    if(resource.split('')[resource.length-1] === '/')
+    {
+      localResource = resource.slice(0, -1);
+    }
+    else{
+      localResource = resource;
+    }
+    return this.request<T>(`${localResource}/${id}`, "DELETE");
   }
 }
 

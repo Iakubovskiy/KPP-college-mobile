@@ -12,7 +12,7 @@ interface ScheduleResponse{
 
 class SubjectService {
     private apiService: APIService;
-    private readonly resource = "teacher";
+    private readonly resource = "teacher/";
 
     constructor(apiService: APIService = new APIService()) {
         this.apiService = apiService;

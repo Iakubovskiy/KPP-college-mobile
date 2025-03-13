@@ -26,6 +26,7 @@ class SubjectService {
 
 
     async createSubject(data: SubjectDTO): Promise<Subject> {
+        console.log(data);
         return this.apiService.create(this.resource, data);
     }
 

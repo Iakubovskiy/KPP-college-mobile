@@ -1,4 +1,5 @@
 import APIService from "./ApiService";
+import {API_BASE_URL} from "@/app/config";
 
 interface RegisterData{
     role: string,
@@ -16,9 +17,20 @@ class AuthService {
     constructor(apiService: APIService = new APIService()) {
         this.apiService = apiService;
     }
-
+    // this.apiService.create("login_check", { username, password })
     async login(username: string, password: string): Promise<{ token: string }> {
-        return this.apiService.create("login_check", { username, password });
+        const baseURL = API_BASE_URL;
+        const headers: HeadersInit = {
+            "Content-Type": "application/json",
+        };
+        const req = await fetch(`${baseURL}/login_check`, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify({username, password})
+            }
+        );
+        console.log(req.status);
+        return await req.json();
     }
 
     async register(

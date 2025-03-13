@@ -14,7 +14,7 @@ interface ScheduleResponse{
 
 class GroupService {
     private apiService: APIService;
-    private readonly resource = "group";
+    private readonly resource = "group/";
 
     constructor(apiService: APIService = new APIService()) {
         this.apiService = apiService;
@@ -29,11 +29,11 @@ class GroupService {
     }
 
     async getGroupStudents(id: number): Promise<Student[]> {
-        return this.apiService.getAll(`${this.resource}-students/${id}`);
+        return this.apiService.getAll(`group-students/${id}`);
     }
 
     async getSchedule(id:number, day?: string): Promise<ScheduleResponse[]> {
-        const data:Schedule[] = await this.apiService.getAll(`${this.resource}-schedule/${id}`);
+        const data:Schedule[] = await this.apiService.getAll(`group-schedule/${id}`);
         const requiredDate:ScheduleResponse[] = data.map((item:Schedule) => ({
             id: item.id,
             teacher: item.subject.teacher.first_name,
@@ -57,6 +57,7 @@ class GroupService {
     }
 
     async createGroup(data: CreateGroupDTO): Promise<GroupResponse> {
+        console.log(data);
         return this.apiService.create(this.resource, data);
     }
 
